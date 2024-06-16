@@ -1,15 +1,15 @@
-public class Queue {
-    private Node head;
-    private Node tail;
+public class Queue<T> {
+    private Node<T> head;
+    private Node<T> tail;
     private int size;
 
-    private static class Node {
-        Object data;
-        Node next;
-        Node prev;
+    private static class Node<T> {
+        T data;
+        Node<T> next;
 
-        Node(Object data) {
+        Node(T data) {
             this.data = data;
+            this.next = null;
         }
     }
 
@@ -18,57 +18,57 @@ public class Queue {
         tail = null;
         size = 0;
     }
-    public void add(Object value) {
-        Node newNode = new Node(value);
-        if (tail == null) { // Черга порожня
+
+    public void add(T value) {
+        Node<T> newNode = new Node<>(value);
+        if (tail == null) {
             head = newNode;
-            tail = newNode;
         } else {
             tail.next = newNode;
-            newNode.prev = tail;
-            tail = newNode;
         }
+        tail = newNode;
         size++;
     }
-    public Object remove() {
-        if (size == 0) {
-            throw new IllegalStateException("Queue is empty");
-        }
-        Node removedNode = head;
-        head = head.next;
-        if (head != null) {
-            head.prev = null;
-        } else {
-            tail = null; // Якщо черга стала порожньою
-        }
-        size--;
-        return removedNode.data;
-    }
+
     public void clear() {
         head = null;
         tail = null;
         size = 0;
     }
+
     public int size() {
         return size;
     }
-    public Object peek() {
-        if (size == 0) {
-            throw new IllegalStateException("Queue is empty");
+
+    public T peek() {
+        if (head == null) {
+            return null;
         }
         return head.data;
     }
 
-    public static void main(String[] args) {
-        Queue queue = new Queue();
-        queue.add("First");
-        queue.add("Second");
-        System.out.println(queue.peek());
-        System.out.println(queue.remove());
-        System.out.println(queue.peek());
-        System.out.println("Size: " + queue.size());
+    public T poll() {
+        if (head == null) {
+            return null;
+        }
+        T data = head.data;
+        head = head.next;
+        if (head == null) {
+            tail = null;
+        }
+        size--;
+        return data;
+    }
 
-        queue.clear();
+    public static void main(String[] args) {
+        Queue<String> queue = new Queue<>();
+        queue.add("Hello");
+        queue.add("World");
         System.out.println("Size: " + queue.size());
+        System.out.println("Peek: " + queue.peek());
+        System.out.println("Poll: " + queue.poll());
+        System.out.println("Size after poll: " + queue.size());
+        queue.clear();
+        System.out.println("Size after clear: " + queue.size());
     }
 }

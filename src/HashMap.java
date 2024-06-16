@@ -1,43 +1,60 @@
-public class HashMap {
-    private static final int INITIAL_CAPACITY = 16;
-    private Node[] table;
-    private int size;
-    private static class Node {
-        final Object key;
-        Object value;
-        Node next;
+import java.util.Objects;
 
-        Node(Object key, Object value) {
+public class HashMap<K, V> {
+    private static final int DEFAULT_CAPACITY = 16;
+    private Node<K, V>[] table;
+    private int size;
+
+    private static class Node<K, V> {
+        final K key;
+        V value;
+        Node<K, V> next;
+
+        Node(K key, V value, Node<K, V> next) {
             this.key = key;
             this.value = value;
+            this.next = next;
         }
     }
 
+    @SuppressWarnings("unchecked")
     public HashMap() {
-        table = new Node[INITIAL_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         size = 0;
     }
-    public void put(Object key, Object value) {
-        int index = getIndex(key);
-        Node current = table[index];
-        while (current != null) {
-            if (current.key.equals(key)) {
-                current.value = value;
-                return;
+
+    private int hash(K key) {
+        return (key == null) ? 0 : Math.abs(key.hashCode()) % table.length;
+    }
+
+    public void put(K key, V value) {
+        int index = hash(key);
+        Node<K, V> newNode = new Node<>(key, value, null);
+        if (table[index] == null) {
+            table[index] = newNode;
+        } else {
+            Node<K, V> current = table[index];
+            while (current != null) {
+                if (Objects.equals(current.key, key)) {
+                    current.value = value;
+                    return;
+                }
+                if (current.next == null) {
+                    current.next = newNode;
+                    break;
+                }
+                current = current.next;
             }
-            current = current.next;
         }
-        Node newNode = new Node(key, value);
-        newNode.next = table[index];
-        table[index] = newNode;
         size++;
     }
-    public void remove(Object key) {
-        int index = getIndex(key);
-        Node current = table[index];
-        Node prev = null;
+
+    public void remove(K key) {
+        int index = hash(key);
+        Node<K, V> current = table[index];
+        Node<K, V> prev = null;
         while (current != null) {
-            if (current.key.equals(key)) {
+            if (Objects.equals(current.key, key)) {
                 if (prev == null) {
                     table[index] = current.next;
                 } else {
@@ -50,42 +67,39 @@ public class HashMap {
             current = current.next;
         }
     }
+
     public void clear() {
-        table = new Node[INITIAL_CAPACITY];
+        table = new Node[DEFAULT_CAPACITY];
         size = 0;
     }
+
     public int size() {
         return size;
     }
-    public Object get(Object key) {
-        int index = getIndex(key);
-        Node current = table[index];
+
+    public V get(K key) {
+        int index = hash(key);
+        Node<K, V> current = table[index];
         while (current != null) {
-            if (current.key.equals(key)) {
+            if (Objects.equals(current.key, key)) {
                 return current.value;
             }
             current = current.next;
         }
         return null;
     }
-    private int getIndex(Object key) {
-        return key == null ? 0 : Math.abs(key.hashCode() % table.length);
-    }
 
     public static void main(String[] args) {
-        HashMap map = new HashMap();
-        map.put("one", 1);
-        map.put("two", 2);
-        System.out.println(map.get("one")); // 1
-        System.out.println(map.get("two")); // 2
-        System.out.println(map.get("three")); // null
-        System.out.println("Size: " + map.size()); // Size: 2
-
-        map.remove("one");
-        System.out.println(map.get("one")); // null
-        System.out.println("Size: " + map.size()); // Size: 1
-
+        HashMap<String, Integer> map = new HashMap<>();
+        map.put("One", 1);
+        map.put("Two", 2);
+        map.put("Three", 3);
+        System.out.println("Size: " + map.size());
+        System.out.println("Get 'Two': " + map.get("Two"));
+        map.remove("Two");
+        System.out.println("Size after removing 'Two': " + map.size());
+        System.out.println("Get 'Two': " + map.get("Two"));
         map.clear();
-        System.out.println("Size: " + map.size()); // Size: 0
+        System.out.println("Size after clear: " + map.size());
     }
 }
