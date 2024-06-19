@@ -1,17 +1,21 @@
 import java.util.Arrays;
 
 public class ArrayList<T> {
-    private Object[] elements;
+    private T[] elements;
     private int size;
+    private static final int DEFAULT_CAPACITY = 10;
 
+    @SuppressWarnings("unchecked")
     public ArrayList() {
-        elements = new Object[10];
+        elements = (T[]) new Object[DEFAULT_CAPACITY];
         size = 0;
     }
+
     public void add(T value) {
         ensureCapacity();
         elements[size++] = value;
     }
+
     public void remove(int index) {
         if (index >= size || index < 0) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
@@ -22,20 +26,24 @@ public class ArrayList<T> {
         }
         elements[--size] = null;
     }
+
     public void clear() {
         Arrays.fill(elements, 0, size, null);
         size = 0;
     }
+
     public int size() {
         return size;
     }
-    @SuppressWarnings("unchecked")
+
     public T get(int index) {
         if (index >= size || index < 0) {
             throw new IndexOutOfBoundsException("Index: " + index + ", Size: " + size);
         }
-        return (T) elements[index];
+        return elements[index];
     }
+
+    @SuppressWarnings("unchecked")
     private void ensureCapacity() {
         if (size == elements.length) {
             int newSize = elements.length * 2;
